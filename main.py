@@ -1,9 +1,11 @@
+
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from database import get_db
 from models import User
+from auth import verify_password, create_access_token, get_current_user
 
 app = FastAPI()
 
@@ -24,4 +26,9 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     return {"access_token": token, "token_type": "bearer"}
 
 @app.get("/me")
-    return {"id": current_user.id, "nome": current_user.nome, "email": current_user.email}
+def get_user(current_user: User = Depends(get_current_user)):
+    return {
+        "id": current_user.id,
+        "nome": current_user.nome,
+        "email": current_user.email
+    }
